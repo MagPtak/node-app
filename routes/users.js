@@ -3,6 +3,8 @@ const router = express.Router()
 const mongoose = require('mongoose')
 const _ = require('lodash')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const config = require('config')
 const Joi = require('joi')
 mongoose.set('strictQuery', true);
 
@@ -41,8 +43,9 @@ router.post('/', async (req, res) => {
 
   await user.save()
 
+  const token = jwt.sign({_id: user._id}, config.get('jwtPrivateKey'))
 
-  res.send(_.pick(user, ['_id', 'name', 'email']))
+  res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']))
 })
 
 function validateUser(user) {
