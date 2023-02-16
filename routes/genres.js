@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 const Joi = require('joi')
+const auth = require('../middleware/auth')
 mongoose.set('strictQuery', true);
 
 const genreSchema = new mongoose.Schema({
@@ -26,7 +27,7 @@ router.get('/:id', async (req, res) => {
   res.send(genre)
 })
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const { error } = validateGenre(req.body)
   if (error) return res.status(400).send(error.details[0].message)
   const genre = new Genre({ name: req.body.name })

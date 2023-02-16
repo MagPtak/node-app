@@ -8,8 +8,7 @@ const config = require('config')
 const Joi = require('joi')
 mongoose.set('strictQuery', true);
 
-
-const User = mongoose.model("User", new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -29,7 +28,14 @@ const User = mongoose.model("User", new mongoose.Schema({
     minlength: 5,
     maxlength: 1024,
   }
-}))
+})
+
+userSchema.methods.generateAuthToken = function() {
+  const token = jwt.sign({_id: this._id}, config.get('jwtPrivateKey'))
+  return token
+}
+
+const User = mongoose.model("User", userSchema)
 
 router.post('/', async (req, res) => {
   const { error } = validateUser(req.body)
@@ -43,8 +49,7 @@ router.post('/', async (req, res) => {
 
   await user.save()
 
-  const token = jwt.sign({_id: user._id}, config.get('jwtPrivateKey'))
-
+  const token = user.generateAuthToken()
   res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']))
 })
 
