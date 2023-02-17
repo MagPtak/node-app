@@ -1,4 +1,5 @@
 const express = require('express')
+const auth = require('../middleware/auth')
 const router = express.Router()
 const mongoose = require('mongoose')
 const _ = require('lodash')
@@ -36,6 +37,11 @@ userSchema.methods.generateAuthToken = function() {
 }
 
 const User = mongoose.model("User", userSchema)
+
+router.get('/me', auth, async (req, res) => {
+ const user = await User.findById(req.user._id).select('-password')
+ res.send(user)
+})
 
 router.post('/', async (req, res) => {
   const { error } = validateUser(req.body)
