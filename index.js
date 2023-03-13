@@ -1,3 +1,4 @@
+const winston = require('winston')
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
 const mongoose = require('mongoose');
@@ -11,6 +12,9 @@ const auth = require('./routes/auth')
 const error = require('./middleware/error')
 const app = express() 
 const config = require('config')
+
+winston.configure({transports: [new winston.transports.File({ filename: 'logfile.log' }) ]});
+
 
 
 mongoose.set('strictQuery', true);
