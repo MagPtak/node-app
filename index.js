@@ -1,4 +1,5 @@
 const winston = require('winston')
+require('winston-mongodb')
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
 const mongoose = require('mongoose');
@@ -13,8 +14,14 @@ const error = require('./middleware/error')
 const app = express() 
 const config = require('config')
 
+process.on('uncaughtException', (ex) => {
+  console.log('WE GOT AN UNCAUGHT EX')
+  winston.error(ex.message, ex)
+})
+
 winston.configure({transports: [new winston.transports.File({ filename: 'logfile.log' }) ]});
 
+throw new Error('Something failed during startup.')
 
 
 mongoose.set('strictQuery', true);
